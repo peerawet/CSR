@@ -5,6 +5,7 @@ import "./App.css";
 import KpiReport from "./components/KpiReport";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
+import NormalDistributeReport from "./components/NormalDistributeReport";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -20,13 +21,13 @@ function App() {
           eventKey="รายงาน Departmental KPI & Individual KPI ของหน่วยงาน"
           title="รายงาน Departmental KPI & Individual KPI ของหน่วยงาน"
         >
-          <KpiReport></KpiReport>
+          <KpiReport />
         </Tab>
         <Tab
           eventKey="Report การตัดเกรดโดยอิงกลุ่ม แบบ Normal Curve Distribution ของกลุ่มตำแหน่ง"
           title="Report การตัดเกรดโดยอิงกลุ่ม แบบ Normal Curve Distribution ของกลุ่มตำแหน่ง"
         >
-          Tab content for Profile
+          <NormalDistributeReport />
         </Tab>
       </Tabs>
     </>
