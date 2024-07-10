@@ -25,7 +25,7 @@ function StatisticTable({
           <td>Average</td>
           <td>{kpiAverage.toFixed(2)}</td>
           <td>SD</td>
-          <td>{kpiSD.toFixed(2)}</td>
+          <td>{kpiSD.toFixed(4)}</td>
         </tr>
         <tr>
           <td>+1 SD</td>

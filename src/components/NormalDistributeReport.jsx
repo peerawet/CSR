@@ -49,7 +49,7 @@ function NormalDistributeReport() {
     // Calculate variance
     const variance =
       kpiValues.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) /
-      kpiValues.length;
+      (kpiValues.length - 1);
 
     // Calculate standard deviation
     const sd = Math.sqrt(variance);
