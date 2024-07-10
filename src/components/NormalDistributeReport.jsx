@@ -31,8 +31,8 @@ function NormalDistributeReport() {
         name: employee.name,
         department: employee.department,
         kpi: (
-          employee.departmental_kpi * 0.3 +
-          employee.individual_kpi * 0.7
+          employee.departmental.kpi * employee.departmental.weight +
+          employee.individual.kpi * employee.individual.weight
         ).toFixed(2),
       }));
       setEmployeeData(fetchResult);
@@ -44,12 +44,19 @@ function NormalDistributeReport() {
 
   const calculateStatistics = (data) => {
     const kpiValues = data.map((d) => parseFloat(d.kpi));
-    const avg = kpiValues.reduce((acc, val) => acc + val, 0) / kpiValues.length;
-    const sd = Math.sqrt(
-      kpiValues.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) /
-        kpiValues.length
-    );
 
+    // Calculate average
+    const avg = kpiValues.reduce((acc, val) => acc + val, 0) / kpiValues.length;
+
+    // Calculate variance
+    const variance =
+      kpiValues.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) /
+      kpiValues.length;
+
+    // Calculate standard deviation
+    const sd = Math.sqrt(variance);
+
+    // Update state with calculated statistics
     setKpiAverage(avg);
     setKpiSD(sd);
     setKpiPlus1SD(avg + sd);
@@ -84,8 +91,8 @@ function NormalDistributeReport() {
         name: employee.name,
         department: employee.department,
         kpi: (
-          employee.departmental_kpi * 0.3 +
-          employee.individual_kpi * 0.7
+          employee.departmental.kpi * employee.departmental.weight +
+          employee.individual.kpi * employee.individual.weight
         ).toFixed(2),
       }));
       setDataTransformed(transformedData);
@@ -142,7 +149,7 @@ function NormalDistributeReport() {
             flex: 2;
           `}
         >
-          <CustomChart />
+          <CustomChart dataTransformed={dataTransformed} />
         </div>
         <div
           css={css`

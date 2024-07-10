@@ -13,6 +13,7 @@ import {
   Filler,
   Tooltip,
   Legend,
+  BarElement,
 } from "chart.js";
 
 ChartJS.register(
@@ -23,7 +24,8 @@ ChartJS.register(
   Title,
   Filler,
   Tooltip,
-  Legend
+  Legend,
+  BarElement
 );
 
 function EmployeeGradeTable({
@@ -56,13 +58,21 @@ function EmployeeGradeTable({
 
     displayEmployeeData.forEach((employee) => {
       const weightedScore =
-        employee.departmental_kpi * 0.3 + employee.individual_kpi * 0.7;
+        employee.departmental.kpi * employee.departmental.weight +
+        employee.individual.kpi * employee.individual.weight;
       const grade = calculateGrade(weightedScore);
       counts[grade]++;
     });
 
     setGradeCounts(counts);
-  }, [displayEmployeeData]);
+  }, [
+    displayEmployeeData,
+    kpiAverage,
+    kpiPlus1SD,
+    kpiMinus1SD,
+    kpiPlus2SD,
+    kpiMinus2SD,
+  ]);
 
   function calculateGrade(kpi) {
     if (kpi >= kpiPlus2SD) {
@@ -151,18 +161,18 @@ function EmployeeGradeTable({
               <td>{employee.name}</td>
               <td>{employee.rank}</td>
               <td>{employee.department}</td>
-              <td>{employee.departmental_kpi}</td>
-              <td>{employee.individual_kpi}</td>
+              <td>{employee.departmental.kpi}</td>
+              <td>{employee.individual.kpi}</td>
               <td>
                 {(
-                  employee.departmental_kpi * 0.3 +
-                  employee.individual_kpi * 0.7
+                  employee.departmental.kpi * employee.departmental.weight +
+                  employee.individual.kpi * employee.individual.weight
                 ).toFixed(2)}
               </td>
               <td>
                 {calculateGrade(
-                  employee.departmental_kpi * 0.3 +
-                    employee.individual_kpi * 0.7
+                  employee.departmental.kpi * employee.departmental.weight +
+                    employee.individual.kpi * employee.individual.weight
                 )}
               </td>
             </tr>

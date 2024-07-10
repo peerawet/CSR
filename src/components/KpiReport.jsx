@@ -62,7 +62,6 @@ function KpiReport() {
       <div
         css={css`
           display: flex;
-
           justify-content: right;
           gap: 10px;
         `}
@@ -120,17 +119,25 @@ function KpiReport() {
                   <td rowSpan={3}>{employee.name}</td>
                   <td rowSpan={3}>{employee.rank}</td>
                   <td>ผลการดำเนินงานจากตัวชี้วัด Departmental KPI</td>
-                  <td>{employee.departmental_kpi}</td>
+                  <td>{employee.departmental.kpi}</td>
                   <td>30%</td>
-                  <td>{(employee.departmental_kpi * 0.3).toFixed(2)}</td>
+                  <td>
+                    {(
+                      employee.departmental.kpi * employee.departmental.weight
+                    ).toFixed(2)}
+                  </td>
                 </tr>
                 <tr>
                   <td key={`${index}-individual`}>
                     ผลการดำเนินงานจากตัวชี้วัด Individual KPI
                   </td>
-                  <td>{employee.individual_kpi}</td>
+                  <td>{employee.individual.kpi}</td>
                   <td>70%</td>
-                  <td>{(employee.individual_kpi * 0.7).toFixed(2)}</td>
+                  <td>
+                    {(
+                      employee.individual.kpi * employee.individual.weight
+                    ).toFixed(2)}
+                  </td>
                 </tr>
                 <tr>
                   <td key={`${index}-combined`} colSpan={2}>
@@ -144,8 +151,8 @@ function KpiReport() {
                     `}
                   >
                     {(
-                      employee.departmental_kpi * 0.3 +
-                      employee.individual_kpi * 0.7
+                      employee.departmental.kpi * employee.departmental.weight +
+                      employee.individual.kpi * employee.individual.weight
                     ).toFixed(2)}
                   </td>
                 </tr>
