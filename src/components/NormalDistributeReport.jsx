@@ -14,6 +14,7 @@ import Select from "react-select";
 
 function NormalDistributeReport() {
   const [employeeData, setEmployeeData] = useState([]);
+  const [displayEmployeeData, setDisplayEmployeeData] = useState([]);
   const [dataTransformed, setDataTransformed] = useState([]);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const [kpiAverage, setKpiAverage] = useState(0);
@@ -72,6 +73,7 @@ function NormalDistributeReport() {
       setKpiPlus2SD(0);
       setKpiMinus2SD(0);
       setDataTransformed([]);
+      setDisplayEmployeeData([]);
     } else {
       setSelectedDepartments(selectedOptions);
       const selectedValues = selectedOptions.map((option) => option.value);
@@ -88,6 +90,7 @@ function NormalDistributeReport() {
       }));
       setDataTransformed(transformedData);
       calculateStatistics(transformedData);
+      setDisplayEmployeeData(filteredData);
     }
   };
 
@@ -103,7 +106,7 @@ function NormalDistributeReport() {
       css={css`
         display: flex;
         flex-direction: column;
-        height: 100vh;
+
         padding: 20px;
         background-color: #f8f9fa;
         gap: 20px;
@@ -178,8 +181,16 @@ function NormalDistributeReport() {
         Report การตัดเกรดโดยอิงกลุ่ม แบบ Normal Curve Distribution
         ของกลุ่มตำแหน่ง (2/2)
       </div>
-      
-      <EmployeeGradeTable employeeData={employeeData}></EmployeeGradeTable>
+
+      <EmployeeGradeTable
+        displayEmployeeData={displayEmployeeData}
+        kpiAverage={kpiAverage}
+        kpiSD={kpiSD}
+        kpiPlus1SD={kpiPlus1SD}
+        kpiMinus1SD={kpiMinus1SD}
+        kpiPlus2SD={kpiPlus2SD}
+        kpiMinus2SD={kpiMinus2SD}
+      ></EmployeeGradeTable>
     </div>
   );
 }

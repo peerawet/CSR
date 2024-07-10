@@ -26,6 +26,10 @@ function RefTable({
     };
 
     dataTransformed.forEach((employee) => {
+      if (kpiAverage == 0) {
+        return gradeCounts;
+      }
+
       const kpi = parseFloat(employee.kpi);
       if (kpi >= kpiPlus2SD) {
         gradeCounts.APlus += 1;

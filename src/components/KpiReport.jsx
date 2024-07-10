@@ -5,6 +5,7 @@ import Table from "react-bootstrap/Table";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getEmployeeData } from "../data/employeeData";
 import Form from "react-bootstrap/Form";
+import React from "react";
 
 function KpiReport() {
   const [employeeData, setEmployeeData] = useState([]);
@@ -113,8 +114,8 @@ function KpiReport() {
                 employee.department === selectedDepartment
             )
             .map((employee, index) => (
-              <>
-                <tr key={index}>
+              <React.Fragment key={index}>
+                <tr>
                   <td rowSpan={3}>{index + 1}</td>
                   <td rowSpan={3}>{employee.name}</td>
                   <td rowSpan={3}>{employee.rank}</td>
@@ -124,17 +125,19 @@ function KpiReport() {
                   <td>{(employee.departmental_kpi * 0.3).toFixed(2)}</td>
                 </tr>
                 <tr>
-                  <td>ผลการดำเนินงานจากตัวชี้วัด Individual KPI</td>
+                  <td key={`${index}-individual`}>
+                    ผลการดำเนินงานจากตัวชี้วัด Individual KPI
+                  </td>
                   <td>{employee.individual_kpi}</td>
                   <td>70%</td>
                   <td>{(employee.individual_kpi * 0.7).toFixed(2)}</td>
                 </tr>
                 <tr>
-                  <td>
+                  <td key={`${index}-combined`} colSpan={2}>
                     ผลการดำเนินงานเมื่อปรับน้ำหนักรวมทั้ง Departmental KPI และ
                     Individual KPI
                   </td>
-                  <td colSpan={2}>100%</td>
+                  <td>100%</td>
                   <td
                     css={css`
                       background-color: yellow !important; /* Use !important to override Bootstrap */
@@ -146,7 +149,7 @@ function KpiReport() {
                     ).toFixed(2)}
                   </td>
                 </tr>
-              </>
+              </React.Fragment>
             ))}
         </tbody>
       </Table>

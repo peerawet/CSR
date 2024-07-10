@@ -16,6 +16,7 @@ import {
   Filler,
   Tooltip,
   Legend,
+  BarElement,
 } from "chart.js";
 
 ChartJS.register(
@@ -26,7 +27,8 @@ ChartJS.register(
   Title,
   Filler,
   Tooltip,
-  Legend
+  Legend,
+  BarElement
 );
 
 function CustomChart() {
