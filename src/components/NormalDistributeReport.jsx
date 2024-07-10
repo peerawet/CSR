@@ -24,19 +24,17 @@ function NormalDistributeReport() {
   const [kpiPlus2SD, setKpiPlus2SD] = useState(0);
   const [kpiMinus2SD, setKpiMinus2SD] = useState(0);
 
+  useEffect(() => {
+    fetchEmployeeData();
+    setDataTransformed([]);
+    setDisplayEmployeeData([]);
+  }, []);
+
   const fetchEmployeeData = async () => {
     try {
       const fetchResult = await getEmployeeData();
-      const transformedData = fetchResult.map((employee) => ({
-        name: employee.name,
-        department: employee.department,
-        kpi: (
-          employee.departmental.kpi * employee.departmental.weight +
-          employee.individual.kpi * employee.individual.weight
-        ).toFixed(2),
-      }));
+
       setEmployeeData(fetchResult);
-      setDataTransformed(transformedData);
     } catch (error) {
       alert("Error fetching employee data: " + error);
     }
@@ -64,10 +62,6 @@ function NormalDistributeReport() {
     setKpiPlus2SD(avg + 2 * sd);
     setKpiMinus2SD(avg - 2 * sd);
   };
-
-  useEffect(() => {
-    fetchEmployeeData();
-  }, []);
 
   const handleDepartmentChange = (selectedOptions) => {
     console.log(selectedOptions);

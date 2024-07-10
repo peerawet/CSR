@@ -10,9 +10,7 @@ HCBellcurve(Highcharts);
 
 function CustomChart({ dataTransformed }) {
   useEffect(() => {
-    if (dataTransformed.length === 0) return; // Don't render chart if no data
-
-    Highcharts.chart("container", {
+    const options = {
       chart: {
         type: "scatter",
       },
@@ -55,7 +53,7 @@ function CustomChart({ dataTransformed }) {
         {
           name: "Data",
           type: "scatter",
-          data: dataTransformed.map((emp) => parseFloat(emp.kpi)), // Use dataTransformed here
+          data: dataTransformed.map((emp) => parseFloat(emp.kpi)),
           accessibility: {
             exposeAsGroupOnly: true,
           },
@@ -64,8 +62,26 @@ function CustomChart({ dataTransformed }) {
           },
         },
       ],
-    });
-  }, [dataTransformed]); // Add dataTransformed to dependencies array to rerender on change
+    };
+
+    // Check if dataTransformed has data to render the chart
+    if (dataTransformed.length > 0) {
+      Highcharts.chart("container", options);
+    } else {
+      // If no data, render an empty chart
+      Highcharts.chart("container", {
+        ...options,
+        series: [
+          ...options.series,
+          {
+            name: "Data",
+            type: "scatter",
+            data: [],
+          },
+        ],
+      });
+    }
+  }, [dataTransformed]);
 
   return (
     <div id="container">
