@@ -2,335 +2,101 @@
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Filler,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Chart, Line } from "react-chartjs-2";
+import Table from "react-bootstrap/Table";
+import { getEmployeeData } from "../data/employeeData";
+import StatisticTable from "./StatisticTable";
+import CustomChart from "./CustomChart";
+import RefTable from "./RefTable";
+import EmployeeGradeTable from "./EmployeeGradeTable";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Filler,
-  Tooltip,
-  Legend
-);
+import Select from "react-select";
 
 function NormalDistributeReport() {
-  const [ratingsData, setRatingsData] = useState([0, 10, 25, 59, 20, 10]);
+  const [employeeData, setEmployeeData] = useState([]);
+  const [dataTransformed, setDataTransformed] = useState([]);
+  const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [kpiAverage, setKpiAverage] = useState(0);
+  const [kpiSD, setKpiSD] = useState(0);
+  const [kpiPlus1SD, setKpiPlus1SD] = useState(0);
+  const [kpiMinus1SD, setKpiMinus1SD] = useState(0);
+  const [kpiPlus2SD, setKpiPlus2SD] = useState(0);
+  const [kpiMinus2SD, setKpiMinus2SD] = useState(0);
 
-  const options = {
-    responsive: true, // Ensures the chart is responsive to container size changes
-
-    plugins: {
-      tooltip: { enabled: false }, // Disables tooltips
-      hover: { mode: null }, // Disables hover interactions
-      legend: {
-        position: "top", // Positions the legend at the top of the chart
-      },
-      title: {
-        display: true,
-        text: "", // Title text (you can customize this)
-      },
-      annotation: {
-        clip: false,
-        annotations: {
-          // Annotations for specific points on the chart
-          label1: {
-            type: "label",
-            display: true,
-            xValue: 1, // X-axis value for annotation
-            yValue: ratingsData[1] + 20, // Y-axis value for annotation (adjust as per your data)
-            backgroundColor: "rgba(255,255,255)", // Background color of annotation
-            content: [ratingsData[1] ? `${ratingsData[1]}%` : ""], // Content of annotation (adjust based on your data)
-            font: {
-              size: 9, // Font size of annotation
-            },
-          },
-          // Repeat similar annotations for label2, label3, etc.
-        },
-      },
-      datalabels: {
-        display: false, // Hides data labels (you can set this to true to display labels on data points)
-      },
-    },
-
-    tension: 0.4, // Tension of the bezier curve in line charts
-
-    scales: {
-      x: {
-        grid: {
-          display: false, // Disables x-axis grid lines
-        },
-        title: {
-          padding: { top: 35, left: 0, right: 0, bottom: 0 },
-          display: true,
-          text: "Normal Company Wide Ratings", // X-axis title
-          font: {
-            weight: "bold",
-            size: 12,
-          },
-        },
-        ticks: {
-          font: {
-            weight: "bold",
-            size: 9,
-          },
-        },
-      },
-      y: {
-        grid: {
-          display: false, // Disables y-axis grid lines
-        },
-        title: {
-          display: true,
-          text: "Number of Newers", // Y-axis title
-          font: {
-            weight: "bold",
-            size: 12,
-          },
-        },
-        ticks: {
-          display: false, // Hides y-axis ticks
-        },
-      },
-    },
+  const fetchEmployeeData = async () => {
+    try {
+      const fetchResult = await getEmployeeData();
+      const transformedData = fetchResult.map((employee) => ({
+        name: employee.name,
+        department: employee.department,
+        kpi: (
+          employee.departmental_kpi * 0.3 +
+          employee.individual_kpi * 0.7
+        ).toFixed(2),
+      }));
+      setEmployeeData(fetchResult);
+      setDataTransformed(transformedData);
+    } catch (error) {
+      alert("Error fetching employee data: " + error);
+    }
   };
 
-  const labels = [
-    "",
+  const calculateStatistics = (data) => {
+    const kpiValues = data.map((d) => parseFloat(d.kpi));
+    const avg = kpiValues.reduce((acc, val) => acc + val, 0) / kpiValues.length;
+    const sd = Math.sqrt(
+      kpiValues.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) /
+        kpiValues.length
+    );
 
-    [[1], ["Needs"], [" Improvement"]],
-
-    "",
-
-    [[2], ["Below"], [" Expectations"]],
-
-    "",
-
-    [[3], ["Met"], [" Expectations"]],
-
-    "",
-
-    [[4], ["Exceeded"], [" Expectations"]],
-
-    "",
-
-    [[5], ["Outstanding"]],
-
-    "",
-  ];
-
-  const getAverageValue = (arr, index) => {
-    let w = 0,
-      x,
-      y,
-      z = 0;
-
-    x = arr[index];
-
-    y = arr[index + 1];
-
-    return x > y ? y + (x - y) / 2 : x + (y - x) / 2;
+    setKpiAverage(avg);
+    setKpiSD(sd);
+    setKpiPlus1SD(avg + sd);
+    setKpiMinus1SD(avg - sd);
+    setKpiPlus2SD(avg + 2 * sd);
+    setKpiMinus2SD(avg - 2 * sd);
   };
 
-  const labels1 = {
-    0: getAverageValue(ratingsData, 0),
+  useEffect(() => {
+    fetchEmployeeData();
+  }, []);
 
-    0.5: ratingsData[1],
-
-    1: getAverageValue(ratingsData, 1),
-
-    1.5: ratingsData[2],
-
-    2: getAverageValue(ratingsData, 2),
-
-    2.5: ratingsData[3],
-
-    3: getAverageValue(ratingsData, 3),
-
-    3.5: ratingsData[4],
-
-    4: getAverageValue(ratingsData, 4),
-
-    4.5: ratingsData[5],
-
-    5: 0,
+  const handleDepartmentChange = (selectedOptions) => {
+    console.log(selectedOptions);
+    if (selectedOptions.length === 0) {
+      // Clear statistics when no departments are selected
+      setKpiAverage(0);
+      setKpiSD(0);
+      setKpiPlus1SD(0);
+      setKpiMinus1SD(0);
+      setKpiPlus2SD(0);
+      setKpiMinus2SD(0);
+      setDataTransformed([]);
+    } else {
+      setSelectedDepartments(selectedOptions);
+      const selectedValues = selectedOptions.map((option) => option.value);
+      const filteredData = selectedValues.length
+        ? employeeData.filter((emp) => selectedValues.includes(emp.department))
+        : employeeData;
+      const transformedData = filteredData.map((employee) => ({
+        name: employee.name,
+        department: employee.department,
+        kpi: (
+          employee.departmental_kpi * 0.3 +
+          employee.individual_kpi * 0.7
+        ).toFixed(2),
+      }));
+      setDataTransformed(transformedData);
+      calculateStatistics(transformedData);
+    }
   };
 
-  var colors = [
-    "rgba(241,91,105,1)",
-
-    "rgba(254,226,130,1)",
-
-    "rgba(31,158,107,1)",
-
-    "rgba(79,162,255,1)",
-
-    "rgba(64,56,255,1)",
-  ];
-
-  let DataSet = [
-    {
-      label: ``,
-
-      data: [labels1["0"], labels1["0.5"], labels1["1"]],
-
-      fill: {
-        target: "origin",
-
-        above: colors[0],
-      },
-
-      backgroundColor: "rgb(255,255,255,0)",
-
-      borderColor: "rgb(255,255,255,0)",
-    },
-
-    {
-      label: ``,
-
-      data: [
-        labels1["0"],
-
-        labels1["0.5"],
-
-        labels1["1"],
-
-        labels1["1.5"],
-
-        labels1["2"],
-      ],
-
-      fill: {
-        target: "origin",
-
-        above: colors[1],
-      },
-
-      backgroundColor: "rgb(255,255,255,0)",
-
-      borderColor: "rgb(255,255,255,0)",
-    },
-
-    {
-      label: ``,
-
-      data: [
-        labels1["0"],
-
-        labels1["0.5"],
-
-        labels1["1"],
-
-        labels1["1.5"],
-
-        labels1["2"],
-
-        labels1["2.5"],
-
-        labels1["3"],
-      ],
-
-      fill: {
-        target: "origin",
-
-        above: colors[2],
-      },
-
-      backgroundColor: "rgb(255,255,255,0)",
-
-      borderColor: "rgb(255,255,255,0)",
-    },
-
-    {
-      label: ``,
-
-      data: [
-        labels1["0"],
-
-        labels1["0.5"],
-
-        labels1["1"],
-
-        labels1["1.5"],
-
-        labels1["2"],
-
-        labels1["2.5"],
-
-        labels1["3"],
-
-        labels1["3.5"],
-
-        labels1["4"],
-      ],
-
-      fill: {
-        target: "origin",
-
-        above: colors[3],
-      },
-
-      backgroundColor: "rgb(255,255,255,0)",
-
-      borderColor: "rgb(255,255,255,0)",
-    },
-
-    {
-      label: ``,
-
-      data: [
-        labels1["0"],
-
-        labels1["0.5"],
-
-        labels1["1"],
-
-        labels1["1.5"],
-
-        labels1["2"],
-
-        labels1["2.5"],
-
-        labels1["3"],
-
-        labels1["3.5"],
-
-        labels1["4"],
-
-        labels1["4.5"],
-
-        labels1["5"],
-      ],
-
-      fill: {
-        target: "origin",
-
-        above: colors[4],
-      },
-
-      backgroundColor: "rgb(255,255,255,0)",
-
-      borderColor: "rgb(255,255,255,0)",
-    },
-  ];
-
-  const data = {
-    labels: labels,
-
-    datasets: DataSet,
-  };
+  const departmentOptions = [
+    ...new Set(employeeData.map((emp) => emp.department)),
+  ].map((dept) => ({
+    value: dept,
+    label: dept,
+  }));
 
   return (
     <div
@@ -352,11 +118,68 @@ function NormalDistributeReport() {
         `}
       >
         Report การตัดเกรดโดยอิงกลุ่ม แบบ Normal Curve Distribution
-        ของกลุ่มตำแหน่ง
+        ของกลุ่มตำแหน่ง (1/2)
       </div>
-      <div>
-        <Line options={options} data={data} />
+      <Select
+        options={departmentOptions}
+        onChange={handleDepartmentChange}
+        isMulti
+        placeholder="Select Department"
+        isClearable
+      />
+      <div
+        css={css`
+          display: flex;
+          flex-direction: row;
+          gap: 20px; /* Adjust the gap as needed */
+        `}
+      >
+        <div
+          css={css`
+            flex: 2;
+          `}
+        >
+          <CustomChart />
+        </div>
+        <div
+          css={css`
+            flex: 1;
+          `}
+        >
+          <StatisticTable
+            kpiAverage={kpiAverage}
+            kpiSD={kpiSD}
+            kpiPlus1SD={kpiPlus1SD}
+            kpiMinus1SD={kpiMinus1SD}
+            kpiPlus2SD={kpiPlus2SD}
+            kpiMinus2SD={kpiMinus2SD}
+          />
+        </div>
       </div>
+
+      <RefTable
+        kpiAverage={kpiAverage}
+        kpiSD={kpiSD}
+        kpiPlus1SD={kpiPlus1SD}
+        kpiMinus1SD={kpiMinus1SD}
+        kpiPlus2SD={kpiPlus2SD}
+        kpiMinus2SD={kpiMinus2SD}
+        dataTransformed={dataTransformed}
+      ></RefTable>
+
+      <div
+        css={css`
+          text-align: center;
+          font-size: 1.5em;
+          color: #333;
+          margin-bottom: 20px;
+        `}
+      >
+        Report การตัดเกรดโดยอิงกลุ่ม แบบ Normal Curve Distribution
+        ของกลุ่มตำแหน่ง (2/2)
+      </div>
+      
+      <EmployeeGradeTable employeeData={employeeData}></EmployeeGradeTable>
     </div>
   );
 }
