@@ -8,8 +8,6 @@ import Tabs from "react-bootstrap/Tabs";
 import NormalDistributeReport from "./pages/NormalDistributeReport";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <Tabs

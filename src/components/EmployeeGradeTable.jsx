@@ -97,52 +97,59 @@ function EmployeeGradeTable({ employeeData }) {
           <Bar data={gradeData} />
         </div>
       </div>
-      <Table
-        striped
-        bordered
-        hover
+      <div
         css={css`
-          text-align: center;
+          overflow-x: auto; /* Enable horizontal scrollbar */
           margin-top: 20px;
         `}
       >
-        <thead>
-          <tr>
-            <th>ชื่อ</th>
-            <th>ตำแหน่ง</th>
-            <th>หน่วยงาน</th>
-            <th>คะแนน Departmental KPI</th>
-            <th>คะแนน Individual KPI</th>
-            <th>คะแนนรวมตามน้ำหนัก</th>
-            <th>Grade ตาม Bell Curve</th>
-          </tr>
-        </thead>
-        <tbody>
-          {employeeData.map((employee, index) => (
-            <tr key={index}>
-              <td>{employee.name}</td>
-              <td>{employee.rank}</td>
-              <td>{employee.department}</td>
-              <td>{employee.departments.departmental_kpi}</td>
-              <td>{employee.individual_kpi}</td>
-              <td>
-                {(
-                  employee.departments.departmental_kpi *
-                    weights.departmental_kpi_weight +
-                  employee.individual_kpi * weights.individual_kpi_weight
-                ).toFixed(2)}
-              </td>
-              <td>
-                {calculateGrade(
-                  employee.departments.departmental_kpi *
-                    weights.departmental_kpi_weight +
-                    employee.individual_kpi * weights.individual_kpi_weight
-                )}
-              </td>
+        <Table
+          striped
+          bordered
+          hover
+          css={css`
+            text-align: center;
+            margin-top: 20px;
+          `}
+        >
+          <thead>
+            <tr>
+              <th>ชื่อ</th>
+              <th>ตำแหน่ง</th>
+              <th>หน่วยงาน</th>
+              <th>คะแนน Departmental KPI</th>
+              <th>คะแนน Individual KPI</th>
+              <th>คะแนนรวมตามน้ำหนัก</th>
+              <th>Grade ตาม Bell Curve</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {employeeData.map((employee, index) => (
+              <tr key={index}>
+                <td>{employee.name}</td>
+                <td>{employee.rank}</td>
+                <td>{employee.department}</td>
+                <td>{employee.departments.departmental_kpi}</td>
+                <td>{employee.individual_kpi}</td>
+                <td>
+                  {(
+                    employee.departments.departmental_kpi *
+                      weights.departmental_kpi_weight +
+                    employee.individual_kpi * weights.individual_kpi_weight
+                  ).toFixed(2)}
+                </td>
+                <td>
+                  {calculateGrade(
+                    employee.departments.departmental_kpi *
+                      weights.departmental_kpi_weight +
+                      employee.individual_kpi * weights.individual_kpi_weight
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
     </>
   );
 }
