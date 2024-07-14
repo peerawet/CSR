@@ -7,8 +7,10 @@ import HCBellcurve from "highcharts/modules/histogram-bellcurve"; // Import the 
 // Initialize the modules
 HCMore(Highcharts);
 HCBellcurve(Highcharts);
+import { useEmployeesKpiTools } from "../contexts/EmployeesKpiTool";
 
-function CustomChart({ dataTransformed }) {
+function CustomChart({ employeeData }) {
+  const { weights } = useEmployeesKpiTools();
   useEffect(() => {
     const options = {
       chart: {
@@ -53,7 +55,12 @@ function CustomChart({ dataTransformed }) {
         {
           name: "Data",
           type: "scatter",
-          data: dataTransformed.map((emp) => parseFloat(emp.kpi)),
+          data: employeeData.map(
+            (employee) =>
+              employee.departments.departmental_kpi *
+                weights.departmental_kpi_weight +
+              employee.individual_kpi * weights.individual_kpi_weight
+          ),
           accessibility: {
             exposeAsGroupOnly: true,
           },
@@ -64,8 +71,8 @@ function CustomChart({ dataTransformed }) {
       ],
     };
 
-    // Check if dataTransformed has data to render the chart
-    if (dataTransformed.length > 0) {
+    // Check if employeeData has data to render the chart
+    if (employeeData.length > 0) {
       Highcharts.chart("container", options);
     } else {
       // If no data, render an empty chart
@@ -81,7 +88,7 @@ function CustomChart({ dataTransformed }) {
         ],
       });
     }
-  }, [dataTransformed]);
+  }, [employeeData]);
 
   return (
     <div id="container">

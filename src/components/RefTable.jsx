@@ -1,55 +1,20 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Line } from "react-chartjs-2";
 import Table from "react-bootstrap/Table";
-import { getEmployeeData } from "../data/employeeData";
+import { useEmployeesKpiTools } from "../contexts/EmployeesKpiTool";
+import { useEffect } from "react";
 
-function RefTable({
-  kpiAverage,
-  kpiSD,
-  kpiPlus1SD,
-  kpiMinus1SD,
-  kpiPlus2SD,
-  kpiMinus2SD,
-  dataTransformed,
-}) {
-  const calculateGradeCounts = () => {
-    let gradeCounts = {
-      APlus: 0,
-      A: 0,
-      B: 0,
-      C: 0,
-      D: 0,
-      F: 0,
-    };
+function RefTable({ employeeData }) {
+  const { kpiStatistics, gradeCount, calculateGradeCounts } =
+    useEmployeesKpiTools();
 
-    dataTransformed.forEach((employee) => {
-      if (kpiAverage == 0) {
-        return gradeCounts;
-      }
+  useEffect(() => {
+    if (employeeData || employeeData.length !== 0) {
+      calculateGradeCounts(employeeData);
+    }
+  }, [employeeData, kpiStatistics]);
 
-      const kpi = parseFloat(employee.kpi);
-      if (kpi >= kpiPlus2SD) {
-        gradeCounts.APlus += 1;
-      } else if (kpi >= kpiPlus1SD && kpi < kpiPlus2SD) {
-        gradeCounts.A += 1;
-      } else if (kpi >= kpiAverage && kpi < kpiPlus1SD) {
-        gradeCounts.B += 1;
-      } else if (kpi >= kpiMinus1SD && kpi < kpiAverage) {
-        gradeCounts.C += 1;
-      } else if (kpi >= kpiMinus2SD && kpi < kpiMinus1SD) {
-        gradeCounts.D += 1;
-      } else {
-        gradeCounts.F += 1;
-      }
-    });
-
-    return gradeCounts;
-  };
-
-  const gradeCounts = calculateGradeCounts();
   return (
     <Table
       striped
@@ -62,40 +27,56 @@ function RefTable({
       <thead>
         <tr>
           <th>Grade</th>
-          <th>ระดับคะแนน</th>
-          <th>จำนวนคน</th>
+          <th>Score Range</th>
+          <th>Number of Employees</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>A+</td>
-          <td>more than {kpiPlus2SD.toFixed(2)}</td>
-          <td>{gradeCounts.APlus}</td>
+          <td>more than {kpiStatistics.kpiPlus2SD.toFixed(2)}</td>
+          <td>{gradeCount.APlus}</td>
         </tr>
         <tr>
           <td>A</td>
-          <td>{`${kpiPlus1SD.toFixed(2)} - ${kpiPlus2SD.toFixed(2)}`}</td>
-          <td>{gradeCounts.A}</td>
+          <td>
+            {`${kpiStatistics.kpiPlus1SD.toFixed(
+              2
+            )} - ${kpiStatistics.kpiPlus2SD.toFixed(2)}`}
+          </td>
+          <td>{gradeCount.A}</td>
         </tr>
         <tr>
           <td>B</td>
-          <td>{`${kpiAverage.toFixed(2)} - ${kpiPlus1SD.toFixed(2)}`}</td>
-          <td>{gradeCounts.B}</td>
+          <td>
+            {`${kpiStatistics.kpiAverage.toFixed(
+              2
+            )} - ${kpiStatistics.kpiPlus1SD.toFixed(2)}`}
+          </td>
+          <td>{gradeCount.B}</td>
         </tr>
         <tr>
           <td>C</td>
-          <td>{`${kpiMinus1SD.toFixed(2)} - ${kpiAverage.toFixed(2)}`}</td>
-          <td>{gradeCounts.C}</td>
+          <td>
+            {`${kpiStatistics.kpiMinus1SD.toFixed(
+              2
+            )} - ${kpiStatistics.kpiAverage.toFixed(2)}`}
+          </td>
+          <td>{gradeCount.C}</td>
         </tr>
         <tr>
           <td>D</td>
-          <td>{`${kpiMinus2SD.toFixed(2)} - ${kpiMinus1SD.toFixed(2)}`}</td>
-          <td>{gradeCounts.D}</td>
+          <td>
+            {`${kpiStatistics.kpiMinus2SD.toFixed(
+              2
+            )} - ${kpiStatistics.kpiMinus1SD.toFixed(2)}`}
+          </td>
+          <td>{gradeCount.D}</td>
         </tr>
         <tr>
           <td>F</td>
-          <td>less than {kpiMinus2SD.toFixed(2)}</td>
-          <td>{gradeCounts.F}</td>
+          <td>less than {kpiStatistics.kpiMinus2SD.toFixed(2)}</td>
+          <td>{gradeCount.F}</td>
         </tr>
       </tbody>
     </Table>

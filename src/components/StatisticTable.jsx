@@ -1,19 +1,18 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { css } from "@emotion/react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Line } from "react-chartjs-2";
 import Table from "react-bootstrap/Table";
-import { getEmployeeData } from "../data/employeeData";
+import { useEmployeesKpiTools } from "../contexts/EmployeesKpiTool";
 
-function StatisticTable({
-  kpiAverage,
-  kpiSD,
-  kpiPlus1SD,
-  kpiMinus1SD,
-  kpiPlus2SD,
-  kpiMinus2SD,
-}) {
+function StatisticTable({ employeeData }) {
+  const { calculateStatistics, kpiStatistics } = useEmployeesKpiTools();
+
+  useEffect(() => {
+    if (employeeData && employeeData.length > 0) {
+      calculateStatistics(employeeData);
+    }
+  }, [employeeData, calculateStatistics]);
+
   return (
     <Table
       css={css`
@@ -23,21 +22,21 @@ function StatisticTable({
       <tbody>
         <tr>
           <td>Average</td>
-          <td>{kpiAverage.toFixed(2)}</td>
+          <td>{kpiStatistics.kpiAverage.toFixed(2)}</td>
           <td>SD</td>
-          <td>{kpiSD.toFixed(4)}</td>
+          <td>{kpiStatistics.kpiSD.toFixed(4)}</td>
         </tr>
         <tr>
           <td>+1 SD</td>
-          <td>{kpiPlus1SD.toFixed(2)}</td>
+          <td>{kpiStatistics.kpiPlus1SD.toFixed(2)}</td>
           <td>-1 SD</td>
-          <td>{kpiMinus1SD.toFixed(2)}</td>
+          <td>{kpiStatistics.kpiMinus1SD.toFixed(2)}</td>
         </tr>
         <tr>
           <td>+2 SD</td>
-          <td>{kpiPlus2SD.toFixed(2)}</td>
+          <td>{kpiStatistics.kpiPlus2SD.toFixed(2)}</td>
           <td>-2 SD</td>
-          <td>{kpiMinus2SD.toFixed(2)}</td>
+          <td>{kpiStatistics.kpiMinus2SD.toFixed(2)}</td>
         </tr>
       </tbody>
     </Table>

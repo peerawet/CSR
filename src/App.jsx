@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { css } from "@emotion/react"; // Use css from @emotion/react
 import "./App.css";
-import KpiReport from "./components/KpiReport";
+import KpiReport from "./pages/KpiReport";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import NormalDistributeReport from "./components/NormalDistributeReport";
+import NormalDistributeReport from "./pages/NormalDistributeReport";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -13,7 +13,7 @@ function App() {
   return (
     <>
       <Tabs
-        defaultActiveKey="profile"
+        defaultActiveKey="รายงาน Departmental KPI & Individual KPI ของหน่วยงาน"
         id="uncontrolled-tab-example"
         className="mb-3"
       >

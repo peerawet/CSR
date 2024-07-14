@@ -15,6 +15,7 @@ import {
   Legend,
   BarElement,
 } from "chart.js";
+import { useEmployeesKpiTools } from "../contexts/EmployeesKpiTool";
 
 ChartJS.register(
   CategoryScale,
@@ -28,70 +29,27 @@ ChartJS.register(
   BarElement
 );
 
-function EmployeeGradeTable({
-  displayEmployeeData,
-  kpiAverage,
-  kpiSD,
-  kpiPlus1SD,
-  kpiMinus1SD,
-  kpiPlus2SD,
-  kpiMinus2SD,
-}) {
-  const [gradeCounts, setGradeCounts] = useState({
-    APlus: 0,
-    A: 0,
-    B: 0,
-    C: 0,
-    D: 0,
-    F: 0,
-  });
+function EmployeeGradeTable({ employeeData }) {
+  const { kpiStatistics, gradeCount, weights } = useEmployeesKpiTools();
 
-  useEffect(() => {
-    const counts = {
-      APlus: 0,
-      A: 0,
-      B: 0,
-      C: 0,
-      D: 0,
-      F: 0,
-    };
-
-    displayEmployeeData.forEach((employee) => {
-      const weightedScore =
-        employee.departmental.kpi * employee.departmental.weight +
-        employee.individual.kpi * employee.individual.weight;
-      const grade = calculateGrade(weightedScore);
-      counts[grade]++;
-    });
-
-    setGradeCounts(counts);
-  }, [
-    displayEmployeeData,
-    kpiAverage,
-    kpiPlus1SD,
-    kpiMinus1SD,
-    kpiPlus2SD,
-    kpiMinus2SD,
-  ]);
-
-  function calculateGrade(kpi) {
-    if (kpi >= kpiPlus2SD) {
-      return "APlus";
-    } else if (kpi >= kpiPlus1SD && kpi < kpiPlus2SD) {
+  const calculateGrade = (kpi) => {
+    if (kpi >= kpiStatistics.kpiPlus2SD) {
+      return "A+";
+    } else if (kpi >= kpiStatistics.kpiPlus1SD) {
       return "A";
-    } else if (kpi >= kpiAverage && kpi < kpiPlus1SD) {
+    } else if (kpi >= kpiStatistics.kpiAverage) {
       return "B";
-    } else if (kpi >= kpiMinus1SD && kpi < kpiAverage) {
+    } else if (kpi >= kpiStatistics.kpiMinus1SD) {
       return "C";
-    } else if (kpi >= kpiMinus2SD && kpi < kpiMinus1SD) {
+    } else if (kpi >= kpiStatistics.kpiMinus2SD) {
       return "D";
     } else {
       return "F";
     }
-  }
+  };
 
   const gradeData = {
-    labels: Object.keys(gradeCounts),
+    labels: Object.keys(gradeCount),
     datasets: [
       {
         label: "Employee Grades",
@@ -112,7 +70,7 @@ function EmployeeGradeTable({
           "rgb(255, 159, 64)",
         ],
         borderWidth: 1,
-        data: Object.values(gradeCounts),
+        data: Object.values(gradeCount),
       },
     ],
   };
@@ -129,7 +87,11 @@ function EmployeeGradeTable({
       >
         <div
           css={css`
-            width: 50%;
+            width: 100%;
+            @media (min-width: 992px) {
+              /* Large screen styles */
+              width: 50%;
+            }
           `}
         >
           <Bar data={gradeData} />
@@ -156,23 +118,25 @@ function EmployeeGradeTable({
           </tr>
         </thead>
         <tbody>
-          {displayEmployeeData.map((employee, index) => (
+          {employeeData.map((employee, index) => (
             <tr key={index}>
               <td>{employee.name}</td>
               <td>{employee.rank}</td>
               <td>{employee.department}</td>
-              <td>{employee.departmental.kpi}</td>
-              <td>{employee.individual.kpi}</td>
+              <td>{employee.departments.departmental_kpi}</td>
+              <td>{employee.individual_kpi}</td>
               <td>
                 {(
-                  employee.departmental.kpi * employee.departmental.weight +
-                  employee.individual.kpi * employee.individual.weight
+                  employee.departments.departmental_kpi *
+                    weights.departmental_kpi_weight +
+                  employee.individual_kpi * weights.individual_kpi_weight
                 ).toFixed(2)}
               </td>
               <td>
                 {calculateGrade(
-                  employee.departmental.kpi * employee.departmental.weight +
-                    employee.individual.kpi * employee.individual.weight
+                  employee.departments.departmental_kpi *
+                    weights.departmental_kpi_weight +
+                    employee.individual_kpi * weights.individual_kpi_weight
                 )}
               </td>
             </tr>
