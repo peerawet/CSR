@@ -96,7 +96,14 @@ function KpiReport() {
             text-align: center;
           `}
         >
-          <thead>
+          <thead
+            css={css`
+              position: sticky;
+              top: 0;
+              background-color: #ffffff; /* Background color for the sticky header */
+              z-index: 1; /* Ensure the header stays above other content */
+            `}
+          >
             <tr>
               <th>No</th>
               <th>ชื่อ</th>
