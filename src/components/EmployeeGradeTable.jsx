@@ -128,7 +128,7 @@ function EmployeeGradeTable({ employeeData }) {
               <tr key={index}>
                 <td>{employee.name}</td>
                 <td>{employee.rank}</td>
-                <td>{employee.department}</td>
+                <td>{employee.departments.name}</td>
                 <td>{employee.departments.departmental_kpi}</td>
                 <td>{employee.individual_kpi}</td>
                 <td>
